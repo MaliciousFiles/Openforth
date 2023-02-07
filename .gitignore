@@ -2,3 +2,4 @@ Library/
 obj/
 Temp/
 Logs/
+.DS_Store
