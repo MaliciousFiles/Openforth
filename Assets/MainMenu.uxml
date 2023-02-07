@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/MainMenu.uss?fileID=7433441132597879392&amp;guid=d0b2567d163fc403f91d5d24bf73405c&amp;type=3#MainMenu" />
+    <ui:GroupBox name="background" style="background-color: rgb(65, 142, 144); width: 100%; height: 100%; position: absolute; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; display: flex;" />
+    <ui:Label text="Openforth" name="title" style="-unity-font-style: bold; font-size: 100px; position: absolute; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 100%; -unity-text-align: upper-center; top: 92px; left: 0; color: rgb(210, 210, 210);" />
+    <ui:GroupBox name="main-menu" class="button-container" style="top: 325px; height: 250px;">
+        <ui:Button text="Play" name="play-button" class="button" style="cursor: initial;" />
+        <ui:Button text="Settings" name="settings-button" class="button" />
+        <ui:Button text="Exit" name="exit-button" class="button" />
+    </ui:GroupBox>
+    <ui:GroupBox name="play-type-menu" class="button-container" style="top: 325px; height: 250px; left: 100%; align-items: flex-start; justify-content: flex-start;">
+        <ui:Button text="2 Player" name="2-player-button" class="button" style="cursor: initial; left: 15%; top: 30px;" />
+        <ui:Button text="3 Player" name="3-player-button" class="button" style="right: 15%; top: 30px;" />
+        <ui:Button text="4 Player" name="4-player-button" class="button" style="left: 50%; translate: -50% 0; bottom: 50px;" />
+    </ui:GroupBox>
+    <ui:GroupBox name="settings-menu" class="button-container" style="top: 325px; height: 250px; left: 100%; justify-content: center;">
+        <ui:Label text="Nothing to see here yet :P" display-tooltip-when-elided="true" style="font-size: 70px; -unity-font-style: bold; color: rgba(51, 51, 51, 255);" />
+    </ui:GroupBox>
+    <ui:Button text="Back" name="back-button" class="button back-button" style="top: 90%; translate: 0 -100%; left: 110%; width: 300px;" />
+</ui:UXML>

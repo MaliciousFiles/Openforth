@@ -1,0 +1,25 @@
+﻿<Properties StartupConfiguration="{7F6CD2C3-7AD4-82F9-EECC-A285DFCDD5A9}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/UIController.cs">
+    <Files>
+      <File FileName="Assets/MainMenu.uxml" Line="10" Column="91" />
+      <File FileName="Assets/MainMenu.uss" />
+      <File FileName="Assets/UIController.cs" Line="65" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Openforth" expanded="True">
+            <Node name="Assets" expanded="True" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="749b2ff1-5004-4e3d-8a13-103b9f28fae6" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

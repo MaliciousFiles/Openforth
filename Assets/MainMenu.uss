@@ -1,0 +1,44 @@
+.button {
+    width: 388px;
+    background-color: rgb(73, 173, 165);
+    height: 61px;
+    font-size: 40px;
+    -unity-font-style: normal;
+    color: rgb(213, 255, 254);
+    border-width: 0;
+    border-radius: 7px;
+}
+
+.button:hover {
+    background-color: rgb(60, 190, 179);
+}
+
+.button:active {
+    background-color: rgb(104, 185, 179);
+}
+
+.button-container {
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    position: absolute;
+    width: 100%;
+    left: 0;
+}
+
+#play-type-menu .button {
+    position: absolute;
+}
+
+#back-button, .button-container {
+    transition-property: left;
+    transition-duration: 500ms;
+    transition-timing-function: linear;
+}
