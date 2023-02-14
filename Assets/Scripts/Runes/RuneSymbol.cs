@@ -1,0 +1,19 @@
+﻿public enum RuneSymbol
+{
+    PlayerA,
+    PlayerB,
+    PlayerC,
+    PlayerD,
+    Harm,
+    Add,
+    Subtract,
+    Pop,
+    Invert,
+    HealthField,
+    CastSpeedField,
+    TurnOrder,
+    AddInPlace,
+    SubtractInPlace,
+    Alias,
+    Skip
+}

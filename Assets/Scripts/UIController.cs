@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class UIController : MonoBehaviour
 {
-    public static int NUM_PLAYERS;
-
     private string currentPage = "main-menu";
     private readonly Dictionary<string, string> previousPages = new Dictionary<string, string>
     {
@@ -43,9 +42,14 @@ public class UIController : MonoBehaviour
             };
         }
 
-        root.Query<Button>("#play-type-menu .button").ForEach((b) =>
+        root.Q<GroupBox>("play-type-menu").Query<Button>().ForEach((b) =>
         {
-            NUM_PLAYERS = int.Parse(b.name.Split("-")[0]);
+            b.clicked += () =>
+            {
+                int numPlayers = int.Parse(b.name.Split("-")[0]);
+
+                SceneManager.LoadScene("Game", LoadSceneMode.Single);
+            };
         });
 
         back.clicked += () =>
