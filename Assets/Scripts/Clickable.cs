@@ -25,6 +25,28 @@ public abstract class Clickable : MonoBehaviour
         get { return mouseOver && clickEnabled; }
     }
 
+    // if given a non-null value, it will override the colors to either be always selected or deselected
+    private bool? overrideHoverColors;
+    public bool? OverrideHoverColors
+    {
+        get { return overrideHoverColors; }
+        set
+        {
+            if (value != null)
+            {
+                if (value == true && !MouseOver) ModifyColors();
+                else if (value == false && MouseOver) ResetColors();
+            }
+            else
+            {
+                if (MouseOver && overrideHoverColors == false) ModifyColors();
+                else if (!MouseOver && overrideHoverColors == true) ResetColors();
+            }
+
+            overrideHoverColors = value;
+        }
+    }
+
     private Color[] origColors;
 
     public static void SetAllClickable(bool enabled)
@@ -51,14 +73,14 @@ public abstract class Clickable : MonoBehaviour
     {
         mouseOver = true;
 
-        if (clickEnabled) ModifyColors();
+        if (clickEnabled && overrideHoverColors == null) ModifyColors();
     }
 
     private void OnMouseExit()
     {
         mouseOver = false;
 
-        if (clickEnabled) ResetColors();
+        if (clickEnabled && overrideHoverColors == null) ResetColors();
     }
 
     private void ModifyColors()

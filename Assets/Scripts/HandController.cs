@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class HandController : MonoBehaviour
 {
+    public GameObject spellMat;
+
     private readonly Dictionary<int, KeyValuePair<Vector3, Quaternion>> origPositions = new();
     private readonly List<int> resetList = new(); // buffer for fixing werid bug detailed below (#LateUpdate)
 
     public void AddRune(GameObject rune)
     {
-        rune.AddComponent<HandRune>();
+        rune.AddComponent<HandRune>().spellMat = spellMat;
         rune.transform.SetParent(transform);
 
         resetList.Add(rune.transform.GetInstanceID());

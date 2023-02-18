@@ -66,6 +66,7 @@
     <Compile Include="Assets/Scripts/SelectRuneType.cs" />
     <Compile Include="Assets/Scripts/LightFlicker.cs" />
     <Compile Include="Assets/Scripts/HandController.cs" />
+    <Compile Include="Assets/Scripts/SpellMatController.cs" />
     <Compile Include="Assets/Scripts/HandRune.cs" />
     <Compile Include="Assets/Scripts/UIController.cs" />
   </ItemGroup>
@@ -742,6 +743,9 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>Library/ScriptAssemblies/Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Flow">
       <HintPath>Library/ScriptAssemblies/Unity.VisualScripting.Flow.dll</HintPath>
