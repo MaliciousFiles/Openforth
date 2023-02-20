@@ -32,16 +32,8 @@ public abstract class Clickable : MonoBehaviour
         get { return overrideHoverColors; }
         set
         {
-            if (value != null)
-            {
-                if (value == true && !MouseOver) ModifyColors();
-                else if (value == false && MouseOver) ResetColors();
-            }
-            else
-            {
-                if (MouseOver && overrideHoverColors == false) ModifyColors();
-                else if (!MouseOver && overrideHoverColors == true) ResetColors();
-            }
+            if (value ?? !MouseOver) ModifyColors();
+            else ResetColors();
 
             overrideHoverColors = value;
         }
@@ -85,9 +77,10 @@ public abstract class Clickable : MonoBehaviour
 
     private void ModifyColors()
     {
-        foreach (Material mat in GetMaterials())
+        Material[] mats = GetMaterials();
+        for (int i = 0; i < mats.Length; i++)
         {
-            mat.color = Color.Lerp(mat.color, Color.white, 0.15f);
+            mats[i].color = Color.Lerp(origColors[i], Color.white, 0.15f);
         }
     }
 
