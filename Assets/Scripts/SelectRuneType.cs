@@ -40,7 +40,24 @@ public class SelectRuneType : Clickable
 
                 other.fadeOut = true;
 
+                // TODO: DEBUGGING
                 rune = RuneDecks.Draw(type);
+                if (type == RuneType.Symbol)
+                {
+                    int r = -1;
+                    if (Input.GetKey(KeyCode.Alpha0)) r = 0;
+                    else if (Input.GetKey(KeyCode.Alpha1)) r = 1;
+                    else if (Input.GetKey(KeyCode.Alpha2)) r = 2;
+                    else if (Input.GetKey(KeyCode.Alpha3)) r = 3;
+                    else if (Input.GetKey(KeyCode.Alpha4)) r = 4;
+                    else if (Input.GetKey(KeyCode.Alpha5)) r = 5;
+                    else if (Input.GetKey(KeyCode.Alpha6)) r = 6;
+                    else if (Input.GetKey(KeyCode.Alpha7)) r = 7;
+                    else if (Input.GetKey(KeyCode.Alpha8)) r = 8;
+                    else if (Input.GetKey(KeyCode.Alpha9)) r = 9;
+                    
+                    if (r > -1) rune = new SymbolRune((RuneSymbol) r, "S"+r);
+                }
 
                 Clickable.SetAllClickable(false);
             }
@@ -51,7 +68,7 @@ public class SelectRuneType : Clickable
                 newRune.SetParent(transform.parent, false);
                 Destroy(newRune.GetComponent<Animator>());
                 Destroy(newRune.GetComponent<SelectRuneType>());
-                GameObject.Find("Hand").GetComponent<HandController>().AddRune(newRune.gameObject);
+                GameObject.Find("Hand").GetComponent<HandController>().AddRune(new RuneObject(newRune.gameObject, rune));
 
                 transform.parent.gameObject.SetActive(false);
                 Clickable.SetAllClickable(true);
@@ -104,7 +121,7 @@ public class SelectRuneType : Clickable
         {
             baseText = false;
             text.text = rune.display;
-            text.fontSize = 0.9f;
+            text.fontSize = type == RuneType.Number ? 0.9f : 0.42f;
             text.transform.parent.localPosition = new(0, -0.91f, 0);
         }
 

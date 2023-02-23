@@ -12,14 +12,17 @@ public class SpellMatController : MonoBehaviour
 {
     private const float SPACING = 0.14f; // just what it turns out to be
     
-    public GameObject selectorPrefab;
+    public GameObject selectorPrefab, targetsPrefab;
 
     private new Collider collider;
     
-    [CanBeNull] private GameObject selected, rune;
+    [CanBeNull] private GameObject selected;
+    [CanBeNull] private RuneObject rune;
     private int placingRuneStage = -1, selectedIdx = -1;
     private KeyValuePair<Vector3, Quaternion> origRunePos;
     private Vector3 shakeEffect;
+
+    private readonly List<RuneObject> runeList = new();
     
     private void Start()
     {
@@ -60,104 +63,123 @@ public class SpellMatController : MonoBehaviour
             selected = null;
         }
 
-        switch (placingRuneStage)
+        if (placingRuneStage > -1)
         {
-            case 0:
+            Transform t = rune.gameObject.transform;
+            switch (placingRuneStage)
             {
-                const float startingX = 0.41f;
-                
-                Vector3 targetPos = transform.TransformPoint(startingX - SPACING * selectedIdx, 1, 0);
-                Quaternion targetRot = Quaternion.Euler(180, 0, 0);
-
-                rune.transform.localPosition = Vector3.MoveTowards(rune.transform.localPosition, targetPos,
-                    Vector3.Distance(origRunePos.Key, targetPos) * Time.deltaTime * 1.2f);
-                rune.transform.localRotation = Quaternion.RotateTowards(rune.transform.localRotation, targetRot,
-                    Quaternion.Angle(origRunePos.Value, targetRot) * Time.deltaTime * 1.2f);
-
-                bool done = true;
-                TextMeshProUGUI[] texts = selectorPrefab.transform.parent.GetComponentsInChildren<TextMeshProUGUI>();
-                for (int i = selectedIdx; i < texts.Length; i++)
+                case 0:
                 {
-                    Transform text = texts[i].transform;
+                    const float startingX = 0.41f;
 
-                    Vector3 target = new(startingX - SPACING * (i+1), 0, 0);
-                    
-                    text.localPosition = Vector3.MoveTowards(text.localPosition, target,
-                        SPACING * Time.deltaTime * 2f);
+                    Vector3 targetPos = transform.TransformPoint(startingX - SPACING * selectedIdx, 1, 0);
+                    Quaternion targetRot = Quaternion.Euler(180, 0, 0);
 
-                    done &= text.localPosition == target;
+                    t.localPosition = Vector3.MoveTowards(t.localPosition, targetPos,
+                        Vector3.Distance(origRunePos.Key, targetPos) * Time.deltaTime * 1.2f);
+                    t.localRotation = Quaternion.RotateTowards(t.localRotation, targetRot,
+                        Quaternion.Angle(origRunePos.Value, targetRot) * Time.deltaTime * 1.2f);
+
+                    bool done = true;
+                    TextMeshProUGUI[] texts =
+                        selectorPrefab.transform.parent.GetComponentsInChildren<TextMeshProUGUI>();
+                    for (int i = selectedIdx; i < texts.Length; i++)
+                    {
+                        Transform text = texts[i].transform;
+
+                        Vector3 target = new(startingX - SPACING * (i + 1), 0, 0);
+
+                        text.localPosition = Vector3.MoveTowards(text.localPosition, target,
+                            SPACING * Time.deltaTime * 2f);
+
+                        done &= text.localPosition == target;
+                    }
+
+                    if (done && t.localPosition == targetPos && t.localRotation == targetRot)
+                    {
+                        placingRuneStage++;
+                        origRunePos = KeyValuePair.Create(t.localPosition, t.localRotation);
+                    }
+
+                    break;
                 }
-                
-                if (done && rune.transform.localPosition == targetPos && rune.transform.localRotation == targetRot)
+                case 1:
                 {
-                    placingRuneStage++;
-                    origRunePos = KeyValuePair.Create(rune.transform.localPosition, rune.transform.localRotation);
-                }
+                    var targetPos = origRunePos.Key - new Vector3(0, 0.33f, 0);
+                    var curPos = t.localPosition - shakeEffect;
 
-                break;
-            }
-            case 1:
-            {
-                var targetPos = origRunePos.Key - new Vector3(0, 0.33f, 0);
-                var curPos = rune.transform.localPosition - shakeEffect;
+                    curPos = Vector3.MoveTowards(curPos, targetPos,
+                        Vector3.Distance(origRunePos.Key, targetPos) * Time.deltaTime / 1.5f);
+                    t.localPosition = curPos;
 
-                curPos = Vector3.MoveTowards(curPos, targetPos,
-                    Vector3.Distance(origRunePos.Key, targetPos) * Time.deltaTime / 1.5f);
-                rune.transform.localPosition = curPos;
+                    if (t.localPosition == targetPos)
+                    {
+                        rune.gameObject.GetComponent<HandRune>().Destroy();
 
-                if (rune.transform.localPosition == targetPos)
-                {
-                    placingRuneStage = -1;
-                    
-                    Transform text = rune.transform.GetChild(0).GetChild(0);
-                    text.SetParent(selectorPrefab.transform.parent);
-                    text.SetSiblingIndex(selectedIdx + 1);
-                    
-                    rune.GetComponent<HandRune>().Destroy();
-                    rune = null;
-                    selectedIdx = -1;
+                        rune.gameObject = rune.gameObject.GetComponentInChildren<TextMeshProUGUI>().gameObject;
+                        Transform text = rune.gameObject.transform;
+                        text.SetParent(selectorPrefab.transform.parent);
+                        text.SetSiblingIndex(selectedIdx + 1);
+
+                        CalculateTargetBoxes();
+                        
+                        placingRuneStage = -1;
+                        rune = null;
+                        selectedIdx = -1;
+                    }
+                    else
+                    {
+                        var range = 0.05f;
+                        t.localPosition += shakeEffect =
+                            new Vector3(Random.Range(-range, range), 0, Random.Range(-range, range));
+                    }
+
+                    break;
                 }
-                else
-                {
-                    var range = 0.05f;
-                    rune.transform.localPosition += shakeEffect = new Vector3(Random.Range(-range, range), 0, Random.Range(-range, range));
-                }
-                break;
             }
         }
     }
 
     private void OnMouseUpAsButton()
     {
-        if (rune && placingRuneStage == -1)
+        if (rune != null && placingRuneStage == -1)
         {
+            Clickable.SetAllClickable(false);
+            
+            runeList.Insert(selectedIdx, rune);
             placingRuneStage = 0;
 
-            var script = rune.GetComponent<HandRune>();
+            var script = rune.gameObject.GetComponent<HandRune>();
             script.OverrideHoverColors = false;
             
-            rune.transform.SetParent(null);
-
+            rune.gameObject.transform.SetParent(null);
+            
             RemoveSelectors(false);
         }
     }
 
-    public void DrawSelectors(GameObject rune)
+    public void DrawSelectors(RuneObject rune)
     {
         this.rune = rune;
-        origRunePos = KeyValuePair.Create(rune.transform.localPosition, rune.transform.localRotation);
+        origRunePos = KeyValuePair.Create(rune.gameObject.transform.localPosition, rune.gameObject.transform.localRotation);
 
         var runes = selectorPrefab.transform.parent.GetComponentsInChildren<TextMeshProUGUI>();
         for (var i = 0; i <= runes.Length; i++)
         {
-            var selector = Instantiate(selectorPrefab, selectorPrefab.transform.parent, true);
+            var selector = Instantiate(selectorPrefab, selectorPrefab.transform.parent);
 
             selector.SetActive(true);
             selector.transform.localPosition -= new Vector3(i * SPACING, 0, 0);
         }
+
+        SpriteRenderer[] sprites = targetsPrefab.transform.parent.GetComponentsInChildren<SpriteRenderer>();
+        foreach (var s in sprites)
+        {
+            Destroy(s.gameObject);
+        }
     }
 
-    // fullReset: clear not only displaying the selectors but also various instance variables
+    // fullReset: reset everything, not just the selector bars
     public void RemoveSelectors(bool fullReset = true)
     {
         selected = null;
@@ -165,12 +187,62 @@ public class SpellMatController : MonoBehaviour
         {
             rune = null;
             placingRuneStage = selectedIdx = -1;
+
+            CalculateTargetBoxes();
         }
         
         var sprites = selectorPrefab.transform.parent.GetComponentsInChildren<SpriteRenderer>();
         foreach (var sprite in sprites)
         {
             Destroy(sprite.gameObject);
+        }
+    }
+
+    private void CalculateTargetBoxes()
+    {
+        Stack<RuneObject> stack = new();
+        Dictionary<RuneObject, int> targets = new();
+        Dictionary<RuneObject, SpriteRenderer> squares = new();
+        
+        for (int i = 0; i < runeList.Count; i++)
+        {
+            RuneObject rune = runeList[i];
+            
+            stack.Push(rune);
+            
+            if (rune.rune.GetType() == typeof(SymbolRune))
+            {
+                int numTargets = ((SymbolRune)rune.rune).GetTargets(stack);
+
+                for (int j = 1; j <= numTargets; j++)
+                {
+                    numTargets += targets.GetValueOrDefault(runeList[i - j], 0);
+                }
+
+                for (int j = 1; j <= numTargets; j++)
+                {
+                    if (squares.TryGetValue(runeList[i - j], out var sprite))
+                    {
+                        sprite.size -= new Vector2(0.2f, 0.2f);
+                    }
+                }
+                
+                targets[rune] = numTargets;
+                
+                SpriteRenderer square = Instantiate(targetsPrefab, targetsPrefab.transform.parent).GetComponent<SpriteRenderer>();
+                square.transform.localPosition = new(-SPACING * i, 0, 0);
+                square.gameObject.SetActive(true);
+                squares[rune] = square;
+
+                if (numTargets == -1)
+                {
+                    square.color = Color.red;
+                    break;
+                }
+                
+                square.size = new(numTargets + 1, 1);
+                square.transform.localPosition += new Vector3(numTargets * SPACING / 2, 0, 0);
+            }
         }
     }
 }

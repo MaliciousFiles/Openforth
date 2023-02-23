@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class HandRune : Clickable
 {
     public GameObject spellMat;
+    public RuneObject rune;
     private SpellMatController spellMatController;
 
     private Vector3 origScale;
@@ -83,7 +84,7 @@ public class HandRune : Clickable
             
             if (focused)
             {
-                spellMatController.DrawSelectors(gameObject);
+                spellMatController.DrawSelectors(rune);
             }
             else
             {

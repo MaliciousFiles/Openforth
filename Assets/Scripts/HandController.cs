@@ -8,14 +8,18 @@ public class HandController : MonoBehaviour
 
     private readonly Dictionary<int, KeyValuePair<Vector3, Quaternion>> origPositions = new();
     private readonly List<int> resetList = new(); // buffer for fixing werid bug detailed below (#LateUpdate)
-
-    public void AddRune(GameObject rune)
+    
+    public void AddRune(RuneObject rune)
     {
-        rune.AddComponent<HandRune>().spellMat = spellMat;
-        rune.transform.SetParent(transform);
+        HandRune script = rune.gameObject.AddComponent<HandRune>();
+        script.spellMat = spellMat;
+        script.rune = rune;
 
-        resetList.Add(rune.transform.GetInstanceID());
-        origPositions[rune.transform.GetInstanceID()] = KeyValuePair.Create(rune.transform.localPosition, rune.transform.localRotation);
+        Transform t = rune.gameObject.transform;
+        t.SetParent(transform);
+
+        resetList.Add(t.GetInstanceID());
+        origPositions[t.GetInstanceID()] = KeyValuePair.Create(t.localPosition, t.localRotation);
     }
 
     private void Update()

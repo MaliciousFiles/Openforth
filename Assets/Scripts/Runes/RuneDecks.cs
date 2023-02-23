@@ -38,7 +38,7 @@ public class RuneDecks
 
         numberDeck = initialNumberDeck.SelectMany(kvp => Enumerable.Repeat(new NumberRune(kvp.Key, kvp.Key.ToString()), kvp.Value))
             .OrderBy((item) => rnd.Next()).ToList();
-        symbolDeck = initialSymbolDeck.SelectMany(kvp => Enumerable.Repeat(new SymbolRune(kvp.Key, "S"), kvp.Value))
+        symbolDeck = initialSymbolDeck.SelectMany(kvp => Enumerable.Repeat(new SymbolRune(kvp.Key, "S"+(int) kvp.Key), kvp.Value))
             .OrderBy((item) => rnd.Next()).ToList();
     }
 
