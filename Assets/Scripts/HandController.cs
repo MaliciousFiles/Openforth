@@ -8,7 +8,7 @@ public class HandController : MonoBehaviour
 
     private readonly Dictionary<int, KeyValuePair<Vector3, Quaternion>> origPositions = new();
     private readonly List<int> resetList = new(); // buffer for fixing werid bug detailed below (#LateUpdate)
-    
+
     public void AddRune(RuneObject rune)
     {
         HandRune script = rune.gameObject.AddComponent<HandRune>();
@@ -35,7 +35,10 @@ public class HandController : MonoBehaviour
             t.localPosition = Vector3.MoveTowards(t.localPosition, target, Vector3.Distance(origPositions[t.GetInstanceID()].Key, target) * Time.deltaTime / speed);
             t.localRotation = Quaternion.RotateTowards(t.localRotation, angleTarget, Quaternion.Angle(origPositions[t.GetInstanceID()].Value, angleTarget) * Time.deltaTime / speed);
 
-            if (t.localPosition == target && t.localRotation == angleTarget) origPositions[t.GetInstanceID()] = KeyValuePair.Create(target, angleTarget);
+            if (t.localPosition == target && t.localRotation == angleTarget)
+            {
+                origPositions[t.GetInstanceID()] = KeyValuePair.Create(target, angleTarget);
+            }
         }
     }
 

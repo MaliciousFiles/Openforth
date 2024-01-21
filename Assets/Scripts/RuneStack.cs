@@ -1,12 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
 
 public class RuneStack : Clickable
 {
-    public GameObject runeTypePicker;
-
     private float spacing;
     private float offset;
 
@@ -22,27 +20,32 @@ public class RuneStack : Clickable
     {
         if (ClickEnabled)
         {
-            Transform topRune = transform.GetChild(transform.childCount - 1);
-            topRune.SetParent(null);
-
-            Animator anim = topRune.GetComponent<Animator>();
-            anim.enabled = true;
-            anim.Play("Choose Rune");
-            StartCoroutine(Util.OnAnimationFinish(topRune.gameObject, "Choose Rune", () =>
-            {
-                Destroy(topRune.gameObject);
-
-                runeTypePicker.SetActive(true);
-            }));
-
-            Transform newRune = Instantiate(transform.GetChild(0));
-            newRune.name = "Rune";
-            newRune.SetParent(transform);
-            newRune.SetSiblingIndex(0);
-            newRune.localPosition = new(0, offset - spacing, 0);
-
-            Clickable.SetAllClickable(false);
+            GameController.CurrentPlayer.Draw();
         }
+    }
+
+    public void Draw(PlayerController player)
+    {
+        Transform topRune = transform.GetChild(transform.childCount - 1);
+        topRune.SetParent(null);
+
+        Animator anim = topRune.GetComponent<Animator>();
+        anim.enabled = true;
+        anim.Play("Choose Rune");
+        StartCoroutine(Util.OnAnimationFinish(topRune.gameObject, "Choose Rune", () =>
+        {
+            Destroy(topRune.gameObject);
+
+            player.runeTypePicker.SetActive(true);
+        }));
+
+        Transform newRune = Instantiate(transform.GetChild(0));
+        newRune.name = "Rune";
+        newRune.SetParent(transform);
+        newRune.SetSiblingIndex(0);
+        newRune.localPosition = new(0, offset - spacing, 0);
+
+        Clickable.SetAllClickable(false);
     }
 
     private void Update()

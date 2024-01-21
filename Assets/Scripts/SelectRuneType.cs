@@ -34,49 +34,59 @@ public class SelectRuneType : Clickable
         {
             if (baseText)
             {
-                anim.enabled = true;
-                anim.Play("Rune Spin");
-                StartCoroutine(Util.OnAnimationFinish(gameObject, "Rune Spin", () => { ClickEnabled = true; anim.enabled = false; }));
-
-                other.fadeOut = true;
-
-                // TODO: DEBUGGING
-                rune = RuneDecks.Draw(type);
-                if (type == RuneType.Symbol)
-                {
-                    int r = -1;
-                    if (Input.GetKey(KeyCode.Alpha0)) r = 0;
-                    else if (Input.GetKey(KeyCode.Alpha1)) r = 1;
-                    else if (Input.GetKey(KeyCode.Alpha2)) r = 2;
-                    else if (Input.GetKey(KeyCode.Alpha3)) r = 3;
-                    else if (Input.GetKey(KeyCode.Alpha4)) r = 4;
-                    else if (Input.GetKey(KeyCode.Alpha5)) r = 5;
-                    else if (Input.GetKey(KeyCode.Alpha6)) r = 6;
-                    else if (Input.GetKey(KeyCode.Alpha7)) r = 7;
-                    else if (Input.GetKey(KeyCode.Alpha8)) r = 8;
-                    else if (Input.GetKey(KeyCode.Alpha9)) r = 9;
-                    
-                    if (r > -1) rune = new SymbolRune((RuneSymbol) r, "S"+r);
-                }
-
-                Clickable.SetAllClickable(false);
+                GameController.CurrentPlayer.PickRuneType(type);
             }
             else
             {
-                Transform newRune = Instantiate(transform);
-                newRune.name = "Rune";
-                newRune.SetParent(transform.parent, false);
-                Destroy(newRune.GetComponent<Animator>());
-                Destroy(newRune.GetComponent<SelectRuneType>());
-                GameObject.Find("Hand").GetComponent<HandController>().AddRune(new RuneObject(newRune.gameObject, rune));
-
-                transform.parent.gameObject.SetActive(false);
-                Clickable.SetAllClickable(true);
-
-                Reset();
-                other.Reset();
+                GameController.CurrentPlayer.MoveRuneToHand(type);
             }
         }
+    }
+
+    public void ChooseRune()
+    {
+        anim.enabled = true;
+        anim.Play("Rune Spin");
+        StartCoroutine(Util.OnAnimationFinish(gameObject, "Rune Spin", () => { ClickEnabled = true; anim.enabled = false; }));
+
+        other.fadeOut = true;
+
+        // TODO: DEBUGGING
+        rune = RuneDecks.Draw(type);
+        if (type == RuneType.Symbol)
+        {
+            int r = -1;
+            if (Input.GetKey(KeyCode.Alpha0)) r = 0;
+            else if (Input.GetKey(KeyCode.Alpha1)) r = 1;
+            else if (Input.GetKey(KeyCode.Alpha2)) r = 2;
+            else if (Input.GetKey(KeyCode.Alpha3)) r = 3;
+            else if (Input.GetKey(KeyCode.Alpha4)) r = 4;
+            else if (Input.GetKey(KeyCode.Alpha5)) r = 5;
+            else if (Input.GetKey(KeyCode.Alpha6)) r = 6;
+            else if (Input.GetKey(KeyCode.Alpha7)) r = 7;
+            else if (Input.GetKey(KeyCode.Alpha8)) r = 8;
+            else if (Input.GetKey(KeyCode.Alpha9)) r = 9;
+
+            if (r > -1) rune = new SymbolRune((RuneSymbol)r, "S" + r);
+        }
+
+        Clickable.SetAllClickable(false);
+    }
+
+    public void MoveToHand(PlayerController player)
+    {
+        Transform newRune = Instantiate(transform);
+        newRune.name = "Rune";
+        newRune.SetParent(transform.parent, false);
+        Destroy(newRune.GetComponent<Animator>());
+        Destroy(newRune.GetComponent<SelectRuneType>());
+        player.hand.GetComponent<HandController>().AddRune(new RuneObject(newRune.gameObject, rune));
+
+        transform.parent.gameObject.SetActive(false);
+        Clickable.SetAllClickable(false);
+
+        Reset();
+        other.Reset();
     }
 
     private void Reset()

@@ -2,39 +2,50 @@ using UnityEngine;
 
 public class RunButton : Clickable
 {
+    public SpellMatController mat;
+
     private float origY;
+    private bool clicked;
+    private bool running;
 
     private void Start()
     {
         origY = gameObject.transform.position.y;
     }
 
+    public void Click()
+    {
+        clicked = !clicked;
+
+        Clickable.SetAllClickable(false);
+    }
+
+    private void OnMouseUpAsButton()
+    {
+        if (ClickEnabled) Click();
+    }
+
     private float vel = 0;
-    private Color oldColor = Color.clear;
 
     private void Update()
     {
-        Material mat = GetComponent<MeshRenderer>().material;
+        float dist = 0.4f;
+        float buffer = 0.01f;
 
         Vector3 pos = gameObject.transform.localPosition;
-        pos.y = Mathf.SmoothDamp(pos.y, origY - (MouseOver && Input.GetMouseButton(0) ? 0.4f : 0), ref vel, 0.5f);
+        pos.y = Mathf.SmoothDamp(pos.y, origY - (clicked ? dist : 0), ref vel, 0.5f);
         gameObject.transform.localPosition = pos;
 
-        if (pos.y < origY - 0.25)
+        if (!running && pos.y < origY - dist + buffer)
         {
-
-            if (oldColor == Color.clear) oldColor = mat.color;
-            mat.color = Color.green;
-
-            if (MouseOver && Input.GetMouseButtonUp(0))
-            {
-                Debug.Log("clicked!");
-            }
+            running = true;
+            Clickable.SetAllClickable(false);
+            mat.RunSpell(() => clicked = false);
         }
-        else
+        else if (!clicked && pos.y > origY - buffer)
         {
-            if (oldColor != Color.clear) mat.color = oldColor;
-            oldColor = Color.clear;
+            running = false;
+            ClickEnabled = true;
         }
     }
 }

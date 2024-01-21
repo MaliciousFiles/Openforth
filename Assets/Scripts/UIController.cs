@@ -46,7 +46,7 @@ public class UIController : MonoBehaviour
         {
             b.clicked += () =>
             {
-                int numPlayers = int.Parse(b.name.Split("-")[0]);
+                GameController.NUM_PLAYERS = int.Parse(b.name.Split("-")[0]);
 
                 SceneManager.LoadScene("Game", LoadSceneMode.Single);
             };

@@ -12,8 +12,8 @@ public class HandRune : Clickable
     private Quaternion origRot;
 
     private Vector3 targetScale;
-    private Vector3 targetPos;
-    private Quaternion targetRot;
+    private Vector3 posTransform;
+    private Vector3 rotTransform; // in euler angles
 
     private bool focused;
     private bool inMotion;
@@ -23,26 +23,32 @@ public class HandRune : Clickable
     {
         spellMatController = spellMat.GetComponent<SpellMatController>();
         origScale = transform.localScale;
-        origPos = Camera.main.transform.localPosition;
-        origRot = Camera.main.transform.localRotation;
+        origPos = GameController.CurrentPlayer.transform.localPosition;
+        origRot = GameController.CurrentPlayer.transform.localRotation;
 
         targetScale = Vector3.Scale(origScale, new(1.5f, 1, 1.5f));
-        targetPos = spellMat.transform.position + new Vector3(0.5f, 8, -2.8f);
-        targetRot = Quaternion.Euler(80, 0, 0);
+
+        posTransform = spellMat.transform.position + new Vector3(0.5f, 8, -2.8f) - origPos;
+        rotTransform = new Vector3(20, 0, 0) - origRot.eulerAngles;
     }
 
     private void OnMouseUpAsButton()
     {
-        if (ClickEnabled)
+        if (ClickEnabled && transform.parent.parent == GameController.CurrentPlayer.transform)
         {
-            SetAllClickable(false);
-            ClickEnabled = true;
-            
-            focused = !focused;
-            inMotion = true;
-
-            OverrideHoverColors = focused ? true : null;
+            GameController.CurrentPlayer.SelectHandRune(transform.GetSiblingIndex());
         }
+    }
+
+    public void SelectToPlay()
+    {
+        SetAllClickable(false);
+        ClickEnabled = true;
+
+        focused = !focused;
+        inMotion = true;
+
+        OverrideHoverColors = focused ? true : null;
     }
 
     public void Destroy()
@@ -54,34 +60,37 @@ public class HandRune : Clickable
 
     private void Update()
     {
-        Transform camera = Camera.main.transform;
+        Transform player = GameController.CurrentPlayer.transform;
+
+        Vector3 targetPos = origPos + (focused ? posTransform : new());
+        Quaternion targetRot = Quaternion.Euler(origRot.eulerAngles + (focused ? rotTransform : new()));
 
         if (inMotion)
         {
-            camera.localPosition = Vector3.MoveTowards(camera.localPosition, focused ? targetPos : origPos, Vector3.Distance(origPos, targetPos) * Time.deltaTime);
-            camera.localRotation = Quaternion.RotateTowards(camera.localRotation, focused ? targetRot : origRot, Quaternion.Angle(origRot, targetRot) * Time.deltaTime);
+            player.localPosition = Vector3.MoveTowards(player.localPosition, targetPos, posTransform.magnitude * Time.deltaTime);
+            player.localRotation = Quaternion.RotateTowards(player.localRotation, targetRot, rotTransform.magnitude * Time.deltaTime);
 
             transform.localScale = Vector3.MoveTowards(transform.localScale, focused ? targetScale : origScale, Vector3.Distance(origScale, targetScale) * Time.deltaTime * 4);
-            
+
             const float zMod = 0.32f; // how far to move forward to still be able to see the rune in the game
             const float yMod = 0.06f; // how far to move upward to put this rune above the others
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, new(transform.localPosition.x, focused ? yMod : 0, focused ? zMod : 0), zMod * Time.deltaTime * 4);
         }
 
-        if (inMotion && (focused ? targetPos : origPos) == camera.localPosition &&
-            (focused ? targetRot : origRot) == camera.localRotation)
+        if (inMotion && (focused ? targetPos : origPos) == player.localPosition &&
+            (focused ? targetRot : origRot) == player.localRotation)
         {
-            SetAllClickable(!focused);
-            ClickEnabled = true;
-            
+            SetAllClickable(false);
+            ClickEnabled = focused;
+
             if (destroy)
             {
                 Destroy(gameObject);
                 return;
             }
-            
+
             inMotion = false;
-            
+
             if (focused)
             {
                 spellMatController.DrawSelectors(rune);
